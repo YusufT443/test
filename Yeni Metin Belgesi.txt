@@ -1,0 +1,1320 @@
+/*
+ *
+ * A bot that attacks the player that sends a message or the nearest entity (excluding players)
+ *
+ */
+const mineflayer = require('mineflayer')
+
+if (process.argv.length < 4 || process.argv.length > 6) {
+  console.log('Usage : node attack.js <host> <port> [<name>] [<password>]')
+  process.exit(1)
+}
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: parseInt(process.argv[3]),
+  username: process.argv[4] ? process.argv[4] : 'attack',
+  password: process.argv[5]
+})
+
+bot.on('spawn', () => {
+  bot.on('chat', (username, message) => {
+    if (message === 'attack me') attackPlayer(username)
+    else if (message === 'attack') attackEntity()
+  })
+})
+
+function attackPlayer (username) {
+  const player = bot.players[username]
+  if (!player || !player.entity) {
+    bot.chat('I can\'t see you')
+  } else {
+    bot.chat(`Attacking ${player.username}`)
+    bot.attack(player.entity)
+  }
+}
+
+function attackEntity () {
+  const entity = bot.nearestEntity()
+  if (!entity) {
+    bot.chat('No nearby entities')
+  } else {
+    bot.chat(`Attacking ${entity.name ?? entity.username}`)
+    bot.attack(entity)
+  }
+}
+
+const mineflayer = require('mineflayer')
+const autoeat = require('mineflayer-auto-eat')
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: process.argv[3],
+  username: process.argv[4],
+  password: process.argv[5]
+})
+
+// Load the plugin
+bot.loadPlugin(autoeat)
+
+bot.once('spawn', () => {
+  bot.autoEat.options = {
+    priority: 'foodPoints',
+    startAt: 14,
+    bannedFood: []
+  }
+})
+// The bot eats food automatically and emits these events when it starts eating and stops eating.
+
+bot.on('autoeat_started', () => {
+  console.log('Auto Eat started!')
+})
+
+bot.on('autoeat_stopped', () => {
+  console.log('Auto Eat stopped!')
+})
+
+bot.on('health', () => {
+  if (bot.food === 20) bot.autoEat.disable()
+  // Disable the plugin if the bot is at 20 food points
+  else bot.autoEat.enable() // Else enable the plugin again
+})
+
+const mineflayer = require('mineflayer')
+const autoeat = require('mineflayer-auto-eat')
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: process.argv[3],
+  username: process.argv[4],
+  password: process.argv[5]
+})
+
+// Load the plugin
+bot.loadPlugin(autoeat)
+
+bot.once('spawn', () => {
+  bot.autoEat.options = {
+    priority: 'foodPoints',
+    startAt: 14,
+    bannedFood: []
+  }
+})
+// The bot eats food automatically and emits these events when it starts eating and stops eating.
+
+bot.on('autoeat_started', () => {
+  console.log('Auto Eat started!')
+})
+
+bot.on('autoeat_stopped', () => {
+  console.log('Auto Eat stopped!')
+})
+
+bot.on('health', () => {
+  if (bot.food === 20) bot.autoEat.disable()
+  // Disable the plugin if the bot is at 20 food points
+  else bot.autoEat.enable() // Else enable the plugin again
+})
+
+
+/*
+ * This simple bot will help you find any block
+ */
+const mineflayer = require('mineflayer')
+
+const { performance } = require('perf_hooks')
+
+if (process.argv.length < 4 || process.argv.length > 6) {
+  console.log('Usage : node blockfinder.js <host> <port> [<name>] [<password>]')
+  process.exit(1)
+}
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: parseInt(process.argv[3]),
+  username: process.argv[4] ? process.argv[4] : 'finder',
+  password: process.argv[5]
+})
+
+bot.on('chat', async (username, message) => {
+  if (username === bot.username) return
+
+  if (message === 'loaded') {
+    console.log(bot.entity.position)
+    await bot.waitForChunksToLoad()
+    bot.chat('Ready!')
+  }
+
+  if (message.startsWith('find')) {
+    const name = message.split(' ')[1]
+    if (bot.registry.blocksByName[name] === undefined) {
+      bot.chat(`${name} is not a block name`)
+      return
+    }
+    const ids = [bot.registry.blocksByName[name].id]
+
+    const startTime = performance.now()
+    const blocks = bot.findBlocks({ matching: ids, maxDistance: 128, count: 10 })
+    const time = (performance.now() - startTime).toFixed(2)
+
+    bot.chat(`I found ${blocks.length} ${name} blocks in ${time} ms`)
+  }
+})
+
+
+/*
+ * This simple bot will help you find any block
+ */
+const mineflayer = require('mineflayer')
+
+const { performance } = require('perf_hooks')
+
+if (process.argv.length < 4 || process.argv.length > 6) {
+  console.log('Usage : node blockfinder.js <host> <port> [<name>] [<password>]')
+  process.exit(1)
+}
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: parseInt(process.argv[3]),
+  username: process.argv[4] ? process.argv[4] : 'finder',
+  password: process.argv[5]
+})
+
+bot.on('chat', async (username, message) => {
+  if (username === bot.username) return
+
+  if (message === 'loaded') {
+    console.log(bot.entity.position)
+    await bot.waitForChunksToLoad()
+    bot.chat('Ready!')
+  }
+
+  if (message.startsWith('find')) {
+    const name = message.split(' ')[1]
+    if (bot.registry.blocksByName[name] === undefined) {
+      bot.chat(`${name} is not a block name`)
+      return
+    }
+    const ids = [bot.registry.blocksByName[name].id]
+
+    const startTime = performance.now()
+    const blocks = bot.findBlocks({ matching: ids, maxDistance: 128, count: 10 })
+    const time = (performance.now() - startTime).toFixed(2)
+
+    bot.chat(`I found ${blocks.length} ${name} blocks in ${time} ms`)
+  }
+})
+
+
+/*
+ * This example demonstrates how easy it is to create a bot
+ * that sends chat messages whenever something interesting happens
+ * on the server you are connected to.
+ *
+ * Below you can find a wide range of different events you can watch
+ * but remember to check out the API documentation to find even more!
+ *
+ * Some events may be commented out because they are very frequent and
+ * may flood the chat, feel free to check them out for other purposes though.
+ *
+ * This bot also replies to some specific chat messages so you can ask him
+ * a few informations while you are in game.
+ */
+const mineflayer = require('mineflayer')
+const { Vec3 } = require('vec3')
+
+if (process.argv.length < 4 || process.argv.length > 6) {
+  console.log('Usage : node chatterbot.js <host> <port> [<name>] [<password>]')
+  process.exit(1)
+}
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: parseInt(process.argv[3]),
+  username: process.argv[4] ? process.argv[4] : 'chatterbox',
+  password: process.argv[5]
+})
+
+bot.on('chat', (username, message) => {
+  if (username === bot.username) return
+  const result = /canSee (-?[0-9]+),(-?[0-9]+),(-?[0-9]+)/.exec(message)
+  if (result) {
+    canSee(new Vec3(result[1], result[2], result[3]))
+    return
+  }
+  switch (message) {
+    case 'pos':
+      sayPosition(username)
+      break
+    case 'wearing':
+      sayEquipment()
+      break
+    case 'nick':
+      sayNick()
+      break
+    case 'spawn':
+      saySpawnPoint()
+      break
+    case 'block':
+      sayBlockUnder(username)
+      break
+    case 'quit':
+      quit(username)
+      break
+    default:
+      bot.chat("That's nice")
+  }
+
+  function canSee (pos) {
+    const block = bot.blockAt(pos)
+    const r = bot.canSeeBlock(block)
+    if (r) {
+      bot.chat(`I can see the block of ${block.displayName} at ${pos}`)
+    } else {
+      bot.chat(`I cannot see the block of ${block.displayName} at ${pos}`)
+    }
+  }
+
+  function sayPosition (username) {
+    bot.chat(`I am at ${bot.entity.position}`)
+    bot.chat(`You are at ${bot.players[username].entity.position}`)
+  }
+
+  function sayEquipment () {
+    const eq = bot.players[username].entity.equipment
+    const eqText = []
+    if (eq[0]) eqText.push(`holding a ${eq[0].displayName}`)
+    if (eq[1]) eqText.push(`wearing a ${eq[1].displayName} on your feet`)
+    if (eq[2]) eqText.push(`wearing a ${eq[2].displayName} on your legs`)
+    if (eq[3]) eqText.push(`wearing a ${eq[3].displayName} on your torso`)
+    if (eq[4]) eqText.push(`wearing a ${eq[4].displayName} on your head`)
+    if (eqText.length) {
+      bot.chat(`You are ${eqText.join(', ')}.`)
+    } else {
+      bot.chat('You are naked!')
+    }
+  }
+
+  function saySpawnPoint () {
+    bot.chat(`Spawn is at ${bot.spawnPoint}`)
+  }
+
+  function sayBlockUnder () {
+    const block = bot.blockAt(bot.players[username].entity.position.offset(0, -1, 0))
+    bot.chat(`Block under you is ${block.displayName} in the ${block.biome.name} biome`)
+    console.log(block)
+  }
+
+  function quit (username) {
+    bot.quit(`${username} told me to`)
+  }
+
+  function sayNick () {
+    bot.chat(`My name is ${bot.player.displayName}`)
+  }
+})
+
+bot.on('whisper', (username, message, rawMessage) => {
+  console.log(`I received a message from ${username}: ${message}`)
+  bot.whisper(username, 'I can tell secrets too.')
+})
+bot.on('nonSpokenChat', (message) => {
+  console.log(`Non spoken chat: ${message}`)
+})
+
+bot.on('login', () => {
+  bot.chat('Hi everyone!')
+})
+bot.on('spawn', () => {
+  bot.chat('I spawned, watch out!')
+})
+bot.on('spawnReset', (message) => {
+  bot.chat('Oh noez! My bed is broken.')
+})
+bot.on('forcedMove', () => {
+  bot.chat(`I have been forced to move to ${bot.entity.position}`)
+})
+bot.on('health', () => {
+  bot.chat(`I have ${bot.health} health and ${bot.food} food`)
+})
+bot.on('death', () => {
+  bot.chat('I died x.x')
+})
+bot.on('kicked', (reason) => {
+  console.log(`I got kicked for ${reason}`)
+})
+
+bot.on('time', () => {
+  bot.chat('Current time: ' + bot.time.timeOfDay)
+})
+bot.on('rain', () => {
+  if (bot.isRaining) {
+    bot.chat('It started raining.')
+  } else {
+    bot.chat('It stopped raining.')
+  }
+})
+bot.on('noteHeard', (block, instrument, pitch) => {
+  bot.chat(`Music for my ears! I just heard a ${instrument.name}`)
+})
+bot.on('chestLidMove', (block, isOpen) => {
+  const action = isOpen ? 'open' : 'close'
+  bot.chat(`Hey, did someone just ${action} a chest?`)
+})
+bot.on('pistonMove', (block, isPulling, direction) => {
+  const action = isPulling ? 'pulling' : 'pushing'
+  bot.chat(`A piston is ${action} near me, i can hear it.`)
+})
+
+bot.on('playerJoined', (player) => {
+  if (player.username !== bot.username) {
+    bot.chat(`Hello, ${player.username}! Welcome to the server.`)
+  }
+})
+bot.on('playerLeft', (player) => {
+  if (player.username === bot.username) return
+  bot.chat(`Bye ${player.username}`)
+})
+bot.on('playerCollect', (collector, collected) => {
+  if (collector.type === 'player') {
+    const item = collected.getDroppedItem()
+    bot.chat(`${collector.username !== bot.username ? ("I'm so jealous. " + collector.username) : 'I '} collected ${item.count} ${item.displayName}`)
+  }
+})
+
+bot.on('entitySpawn', (entity) => {
+  if (entity.type === 'mob') {
+    console.log(`Look out! A ${entity.mobType} spawned at ${entity.position}`)
+  } else if (entity.type === 'player') {
+    bot.chat(`Look who decided to show up: ${entity.username}`)
+  } else if (entity.type === 'object') {
+    console.log(`There's a ${entity.objectType} at ${entity.position}`)
+  } else if (entity.type === 'global') {
+    bot.chat('Ooh lightning!')
+  } else if (entity.type === 'orb') {
+    bot.chat('Gimme dat exp orb!')
+  }
+})
+bot.on('entityHurt', (entity) => {
+  if (entity.type === 'mob') {
+    bot.chat(`Haha! The ${entity.mobType} got hurt!`)
+  } else if (entity.type === 'player') {
+    bot.chat(`Aww, poor ${entity.username} got hurt. Maybe you shouldn't have a ping of ${bot.players[entity.username].ping}`)
+  }
+})
+bot.on('entitySwingArm', (entity) => {
+  bot.chat(`${entity.username}, I see that your arm is working fine.`)
+})
+bot.on('entityCrouch', (entity) => {
+  bot.chat(`${entity.username}: you so sneaky.`)
+})
+bot.on('entityUncrouch', (entity) => {
+  bot.chat(`${entity.username}: welcome back from the land of hunchbacks.`)
+})
+bot.on('entitySleep', (entity) => {
+  bot.chat(`Good night, ${entity.username}`)
+})
+bot.on('entityWake', (entity) => {
+  bot.chat(`Top of the morning, ${entity.username}`)
+})
+bot.on('entityEat', (entity) => {
+  bot.chat(`${entity.username}: OM NOM NOM NOMONOM. That's what you sound like.`)
+})
+bot.on('entityAttach', (entity, vehicle) => {
+  if (entity.type === 'player' && vehicle.type === 'object') {
+    bot.chat(`Sweet, ${entity.username} is riding that ${vehicle.objectType}`)
+  }
+})
+bot.on('entityDetach', (entity, vehicle) => {
+  if (entity.type === 'player' && vehicle.type === 'object') {
+    bot.chat(`Lame, ${entity.username} stopped riding the ${vehicle.objectType}`)
+  }
+})
+bot.on('entityEquipmentChange', (entity) => {
+  console.log('entityEquipmentChange', entity)
+})
+bot.on('entityEffect', (entity, effect) => {
+  console.log('entityEffect', entity, effect)
+})
+bot.on('entityEffectEnd', (entity, effect) => {
+  console.log('entityEffectEnd', entity, effect)
+})
+
+
+/*
+ * Watch out, this is a big one!
+ *
+ * This is a demonstration to show you how you can interact with:
+ * - Chests
+ * - Furnaces
+ * - Dispensers
+ * - Enchantment Tables
+ *
+ * and of course with your own inventory.
+ *
+ * Each of the main commands makes the bot interact with the block and open
+ * its window. From there you can send another set of commands to actually
+ * interact with the window and make awesome stuff.
+ *
+ * There's also a bonus example which shows you how to use the /invsee command
+ * to see what items another user has in his inventory and what items he has
+ * equipped.
+ * This last one is usually reserved to Server Ops so make sure you have the
+ * appropriate permission to do it or it won't work.
+ */
+const mineflayer = require('mineflayer')
+
+if (process.argv.length < 4 || process.argv.length > 6) {
+  console.log('Usage : node chest.js <host> <port> [<name>] [<password>]')
+  process.exit(1)
+}
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: parseInt(process.argv[3]),
+  username: process.argv[4] ? process.argv[4] : 'chest',
+  password: process.argv[5]
+})
+
+bot.on('experience', () => {
+  bot.chat(`I am level ${bot.experience.level}`)
+})
+
+bot.on('chat', (username, message) => {
+  if (username === bot.username) return
+  switch (true) {
+    case /^list$/.test(message):
+      sayItems()
+      break
+    case /^chest$/.test(message):
+      watchChest(false, ['chest', 'ender_chest', 'trapped_chest'])
+      break
+    case /^furnace$/.test(message):
+      watchFurnace()
+      break
+    case /^dispenser$/.test(message):
+      watchChest(false, ['dispenser'])
+      break
+    case /^enchant$/.test(message):
+      watchEnchantmentTable()
+      break
+    case /^chestminecart$/.test(message):
+      watchChest(true)
+      break
+    case /^invsee \w+( \d)?$/.test(message): {
+      // invsee Herobrine [or]
+      // invsee Herobrine 1
+      const command = message.split(' ')
+      useInvsee(command[0], command[1])
+      break
+    }
+  }
+})
+
+function sayItems (items = bot.inventory.items()) {
+  const output = items.map(itemToString).join(', ')
+  if (output) {
+    bot.chat(output)
+  } else {
+    bot.chat('empty')
+  }
+}
+
+async function watchChest (minecart, blocks = []) {
+  let chestToOpen
+  if (minecart) {
+    chestToOpen = Object.keys(bot.entities)
+      .map(id => bot.entities[id]).find(e => e.entityType === bot.registry.entitiesByName.chest_minecart &&
+      e.objectData.intField === 1 &&
+      bot.entity.position.distanceTo(e.position) < 3)
+    if (!chestToOpen) {
+      bot.chat('no chest minecart found')
+      return
+    }
+  } else {
+    chestToOpen = bot.findBlock({
+      matching: blocks.map(name => bot.registry.blocksByName[name].id),
+      maxDistance: 6
+    })
+    if (!chestToOpen) {
+      bot.chat('no chest found')
+      return
+    }
+  }
+  const chest = await bot.openContainer(chestToOpen)
+  sayItems(chest.containerItems())
+  chest.on('updateSlot', (slot, oldItem, newItem) => {
+    bot.chat(`chest update: ${itemToString(oldItem)} -> ${itemToString(newItem)} (slot: ${slot})`)
+  })
+  chest.on('close', () => {
+    bot.chat('chest closed')
+  })
+
+  bot.on('chat', onChat)
+
+  function onChat (username, message) {
+    if (username === bot.username) return
+    const command = message.split(' ')
+    switch (true) {
+      case /^close$/.test(message):
+        closeChest()
+        break
+      case /^withdraw \d+ \w+$/.test(message):
+        // withdraw amount name
+        // ex: withdraw 16 stick
+        withdrawItem(command[2], command[1])
+        break
+      case /^deposit \d+ \w+$/.test(message):
+        // deposit amount name
+        // ex: deposit 16 stick
+        depositItem(command[2], command[1])
+        break
+    }
+  }
+
+  function closeChest () {
+    chest.close()
+    bot.removeListener('chat', onChat)
+  }
+
+  async function withdrawItem (name, amount) {
+    const item = itemByName(chest.containerItems(), name)
+    if (item) {
+      try {
+        await chest.withdraw(item.type, null, amount)
+        bot.chat(`withdrew ${amount} ${item.name}`)
+      } catch (err) {
+        bot.chat(`unable to withdraw ${amount} ${item.name}`)
+      }
+    } else {
+      bot.chat(`unknown item ${name}`)
+    }
+  }
+
+  async function depositItem (name, amount) {
+    const item = itemByName(chest.items(), name)
+    if (item) {
+      try {
+        await chest.deposit(item.type, null, amount)
+        bot.chat(`deposited ${amount} ${item.name}`)
+      } catch (err) {
+        bot.chat(`unable to deposit ${amount} ${item.name}`)
+      }
+    } else {
+      bot.chat(`unknown item ${name}`)
+    }
+  }
+}
+
+async function watchFurnace () {
+  const furnaceBlock = bot.findBlock({
+    matching: ['furnace', 'lit_furnace'].filter(name => bot.registry.blocksByName[name] !== undefined).map(name => bot.registry.blocksByName[name].id),
+    maxDistance: 6
+  })
+  if (!furnaceBlock) {
+    bot.chat('no furnace found')
+    return
+  }
+  const furnace = await bot.openFurnace(furnaceBlock)
+  let output = ''
+  output += `input: ${itemToString(furnace.inputItem())}, `
+  output += `fuel: ${itemToString(furnace.fuelItem())}, `
+  output += `output: ${itemToString(furnace.outputItem())}`
+  bot.chat(output)
+
+  furnace.on('updateSlot', (slot, oldItem, newItem) => {
+    bot.chat(`furnace update: ${itemToString(oldItem)} -> ${itemToString(newItem)} (slot: ${slot})`)
+  })
+  furnace.on('close', () => {
+    bot.chat('furnace closed')
+  })
+  furnace.on('update', () => {
+    console.log(`fuel: ${Math.round(furnace.fuel * 100)}% progress: ${Math.round(furnace.progress * 100)}%`)
+  })
+
+  bot.on('chat', onChat)
+
+  function onChat (username, message) {
+    if (username === bot.username) return
+    const command = message.split(' ')
+    switch (true) {
+      case /^close$/.test(message):
+        closeFurnace()
+        break
+      case /^(input|fuel) \d+ \w+$/.test(message):
+        // input amount name
+        // ex: input 32 coal
+        putInFurnace(command[0], command[2], command[1])
+        break
+      case /^take (input|fuel|output)$/.test(message):
+        // take what
+        // ex: take output
+        takeFromFurnace(command[0])
+        break
+    }
+
+    function closeFurnace () {
+      furnace.close()
+      bot.removeListener('chat', onChat)
+    }
+
+    async function putInFurnace (where, name, amount) {
+      const item = itemByName(furnace.items(), name)
+      if (item) {
+        const fn = {
+          input: furnace.putInput,
+          fuel: furnace.putFuel
+        }[where]
+        try {
+          await fn.call(furnace, item.type, null, amount)
+          bot.chat(`put ${amount} ${item.name}`)
+        } catch (err) {
+          bot.chat(`unable to put ${amount} ${item.name}`)
+        }
+      } else {
+        bot.chat(`unknown item ${name}`)
+      }
+    }
+
+    async function takeFromFurnace (what) {
+      const fn = {
+        input: furnace.takeInput,
+        fuel: furnace.takeFuel,
+        output: furnace.takeOutput
+      }[what]
+      try {
+        const item = await fn.call(furnace)
+        bot.chat(`took ${item.name}`)
+      } catch (err) {
+        bot.chat('unable to take')
+      }
+    }
+  }
+}
+
+async function watchEnchantmentTable () {
+  const enchantTableBlock = bot.findBlock({
+    matching: ['enchanting_table'].map(name => bot.registry.blocksByName[name].id),
+    maxDistance: 6
+  })
+  if (!enchantTableBlock) {
+    bot.chat('no enchantment table found')
+    return
+  }
+  const table = await bot.openEnchantmentTable(enchantTableBlock)
+  bot.chat(itemToString(table.targetItem()))
+
+  table.on('updateSlot', (slot, oldItem, newItem) => {
+    bot.chat(`enchantment table update: ${itemToString(oldItem)} -> ${itemToString(newItem)} (slot: ${slot})`)
+  })
+  table.on('close', () => {
+    bot.chat('enchantment table closed')
+  })
+  table.on('ready', () => {
+    bot.chat(`ready to enchant. choices are ${table.enchantments.map(o => o.level).join(', ')}`)
+  })
+
+  bot.on('chat', onChat)
+
+  function onChat (username, message) {
+    if (username === bot.username) return
+    const command = message.split(' ')
+    switch (true) {
+      case /^close$/.test(message):
+        closeEnchantmentTable()
+        break
+      case /^put \w+$/.test(message):
+        // put name
+        // ex: put diamondsword
+        putItem(command[1])
+        break
+      case /^add lapis$/.test(message):
+        addLapis()
+        break
+      case /^enchant \d+$/.test(message):
+        // enchant choice
+        // ex: enchant 2
+        enchantItem(command[1])
+        break
+      case /^take$/.test(message):
+        takeEnchantedItem()
+        break
+    }
+
+    function closeEnchantmentTable () {
+      table.close()
+    }
+
+    async function putItem (name) {
+      const item = itemByName(table.window.items(), name)
+      if (item) {
+        try {
+          await table.putTargetItem(item)
+          bot.chat(`I put ${itemToString(item)}`)
+        } catch (err) {
+          bot.chat(`error putting ${itemToString(item)}`)
+        }
+      } else {
+        bot.chat(`unknown item ${name}`)
+      }
+    }
+
+    async function addLapis () {
+      const item = itemByType(table.window.items(), ['dye', 'purple_dye', 'lapis_lazuli'].filter(name => bot.registry.itemByName[name] !== undefined)
+        .map(name => bot.registry.itemByName[name].id))
+      if (item) {
+        try {
+          await table.putLapis(item)
+          bot.chat(`I put ${itemToString(item)}`)
+        } catch (err) {
+          bot.chat(`error putting ${itemToString(item)}`)
+        }
+      } else {
+        bot.chat("I don't have any lapis")
+      }
+    }
+
+    async function enchantItem (choice) {
+      choice = parseInt(choice, 10)
+      try {
+        const item = await table.enchant(choice)
+        bot.chat(`enchanted ${itemToString(item)}`)
+      } catch (err) {
+        bot.chat('error enchanting')
+      }
+    }
+
+    async function takeEnchantedItem () {
+      try {
+        const item = await table.takeTargetItem()
+        bot.chat(`got ${itemToString(item)}`)
+      } catch (err) {
+        bot.chat('error getting item')
+      }
+    }
+  }
+}
+
+function useInvsee (username, showEquipment) {
+  bot.once('windowOpen', (window) => {
+    const count = window.containerItems().length
+    const what = showEquipment ? 'equipment' : 'inventory items'
+    if (count) {
+      bot.chat(`${username}'s ${what}:`)
+      sayItems(window.containerItems())
+    } else {
+      bot.chat(`${username} has no ${what}`)
+    }
+  })
+  if (showEquipment) {
+    // any extra parameter triggers the easter egg
+    // and shows the other player's equipment
+    bot.chat(`/invsee ${username} 1`)
+  } else {
+    bot.chat(`/invsee ${username}`)
+  }
+}
+
+function itemToString (item) {
+  if (item) {
+    return `${item.name} x ${item.count}`
+  } else {
+    return '(nothing)'
+  }
+}
+
+function itemByType (items, type) {
+  let item
+  let i
+  for (i = 0; i < items.length; ++i) {
+    item = items[i]
+    if (item && item.type === type) return item
+  }
+  return null
+}
+
+function itemByName (items, name) {
+  let item
+  let i
+  for (i = 0; i < items.length; ++i) {
+    item = items[i]
+    if (item && item.name === name) return item
+  }
+  return null
+}
+
+/**
+ * A quick and easy implementation of the collect block plugin. (Requires mineflayer-pathfinder and mineflayer-collectblock)
+ */
+const mineflayer = require('mineflayer')
+const pathfinder = require('mineflayer-pathfinder').pathfinder
+const collectBlock = require('mineflayer-collectblock').plugin
+
+if (process.argv.length < 4 || process.argv.length > 6) {
+  console.log('Usage : node collectblock.js <host> <port> [<name>] [<password>]')
+  process.exit(1)
+}
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: parseInt(process.argv[3]),
+  username: process.argv[4] ? process.argv[4] : 'collector',
+  password: process.argv[5]
+})
+
+// Load pathfinder and collect block plugins
+bot.loadPlugin(pathfinder)
+bot.loadPlugin(collectBlock)
+
+// Listen for when a player says "collect [something]" in chat
+bot.on('chat', (username, message) => {
+  const args = message.split(' ')
+  if (args[0] !== 'collect') return
+
+  // Get the correct block type
+  const blockType = bot.registry.blocksByName[args[1]]
+  if (!blockType) {
+    bot.chat("I don't know any blocks with that name.")
+    return
+  }
+
+  bot.chat('Collecting the nearest ' + blockType.name)
+
+  // Try and find that block type in the world
+  const block = bot.findBlock({
+    matching: blockType.id,
+    maxDistance: 64
+  })
+
+  if (!block) {
+    bot.chat("I don't see that block nearby.")
+    return
+  }
+
+  // Collect the block if we found one
+  bot.collectBlock.collect(block, err => {
+    if (err) bot.chat(err.message)
+  })
+})
+
+/*
+ * Never spend hours mining from ground to bedrock again!
+ *
+ * Learn how to create a simple bot that is capable of digging the block
+ * below his feet and then going back up by creating a dirt column to the top.
+ *
+ * As always, you can send the bot commands using chat messages, and monitor
+ * his inventory at any time.
+ *
+ * Remember that in survival mode he might not have enough dirt to get back up,
+ * so be sure to teach him a few more tricks before leaving him alone at night.
+ */
+const mineflayer = require('mineflayer')
+const vec3 = require('vec3')
+
+if (process.argv.length < 4 || process.argv.length > 6) {
+  console.log('Usage : node digger.js <host> <port> [<name>] [<password>]')
+  process.exit(1)
+}
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: parseInt(process.argv[3]),
+  username: process.argv[4] ? process.argv[4] : 'digger',
+  password: process.argv[5]
+})
+
+bot.on('chat', async (username, message) => {
+  if (username === bot.username) return
+  switch (message) {
+    case 'loaded':
+      await bot.waitForChunksToLoad()
+      bot.chat('Ready!')
+      break
+    case 'list':
+      sayItems()
+      break
+    case 'dig':
+      dig()
+      break
+    case 'build':
+      build()
+      break
+    case 'equip dirt':
+      equipDirt()
+      break
+  }
+})
+
+function sayItems (items = bot.inventory.items()) {
+  const output = items.map(itemToString).join(', ')
+  if (output) {
+    bot.chat(output)
+  } else {
+    bot.chat('empty')
+  }
+}
+
+async function dig () {
+  let target
+  if (bot.targetDigBlock) {
+    bot.chat(`already digging ${bot.targetDigBlock.name}`)
+  } else {
+    target = bot.blockAt(bot.entity.position.offset(0, -1, 0))
+    if (target && bot.canDigBlock(target)) {
+      bot.chat(`starting to dig ${target.name}`)
+      try {
+        await bot.dig(target)
+        bot.chat(`finished digging ${target.name}`)
+      } catch (err) {
+        console.log(err.stack)
+      }
+    } else {
+      bot.chat('cannot dig')
+    }
+  }
+}
+
+function build () {
+  const referenceBlock = bot.blockAt(bot.entity.position.offset(0, -1, 0))
+  const jumpY = Math.floor(bot.entity.position.y) + 1.0
+  bot.setControlState('jump', true)
+  bot.on('move', placeIfHighEnough)
+
+  let tryCount = 0
+
+  async function placeIfHighEnough () {
+    if (bot.entity.position.y > jumpY) {
+      try {
+        await bot.placeBlock(referenceBlock, vec3(0, 1, 0))
+        bot.setControlState('jump', false)
+        bot.removeListener('move', placeIfHighEnough)
+        bot.chat('Placing a block was successful')
+      } catch (err) {
+        tryCount++
+        if (tryCount > 10) {
+          bot.chat(err.message)
+          bot.setControlState('jump', false)
+          bot.removeListener('move', placeIfHighEnough)
+        }
+      }
+    }
+  }
+}
+
+async function equipDirt () {
+  let itemsByName
+  if (bot.supportFeature('itemsAreNotBlocks')) {
+    itemsByName = 'itemsByName'
+  } else if (bot.supportFeature('itemsAreAlsoBlocks')) {
+    itemsByName = 'blocksByName'
+  }
+  try {
+    await bot.equip(bot.registry[itemsByName].dirt.id, 'hand')
+    bot.chat('equipped dirt')
+  } catch (err) {
+    bot.chat(`unable to equip dirt: ${err.message}`)
+  }
+}
+
+function itemToString (item) {
+  if (item) {
+    return `${item.name} x ${item.count}`
+  } else {
+    return '(nothing)'
+  }
+}
+
+const { Vec3 } = require('vec3')
+const mineflayer = require('mineflayer')
+
+if (process.argv.length < 4 || process.argv.length > 6) {
+  console.log('Usage : node farmer.js <host> <port> [<name>] [<password>]')
+  process.exit(1)
+}
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: parseInt(process.argv[3]),
+  username: process.argv[4] ? process.argv[4] : 'farmer',
+  password: process.argv[5]
+})
+
+// To fish we have to give bot the seeds
+// /give farmer wheat_seeds 64
+
+function blockToSow () {
+  return bot.findBlock({
+    point: bot.entity.position,
+    matching: bot.registry.blocksByName.farmland.id,
+    maxDistance: 6,
+    useExtraInfo: (block) => {
+      const blockAbove = bot.blockAt(block.position.offset(0, 1, 0))
+      return !blockAbove || blockAbove.type === 0
+    }
+  })
+}
+
+function blockToHarvest () {
+  return bot.findBlock({
+    point: bot.entity.position,
+    maxDistance: 6,
+    matching: (block) => {
+      return block && block.type === bot.registry.blocksByName.wheat.id && block.metadata === 7
+    }
+  })
+}
+
+async function loop () {
+  try {
+    while (1) {
+      const toHarvest = blockToHarvest()
+      if (toHarvest) {
+        await bot.dig(toHarvest)
+      } else {
+        break
+      }
+    }
+    while (1) {
+      const toSow = blockToSow()
+      if (toSow) {
+        await bot.equip(bot.registry.itemsByName.wheat_seeds.id, 'hand')
+        await bot.placeBlock(toSow, new Vec3(0, 1, 0))
+      } else {
+        break
+      }
+    }
+  } catch (e) {
+    console.log(e)
+  }
+
+  // No block to harvest or sow. Postpone next loop a bit
+  setTimeout(loop, 1000)
+}
+
+bot.once('login', loop)
+
+/*
+ * Using the inventory is one of the first things you learn in Minecraft,
+ * now it's time to teach your bot the same skill.
+ *
+ * Command your bot with chat messages and make him toss, equip, use items
+ * and even craft new items using the built-in recipe book.
+ *
+ * To learn more about the recipe system and how crafting works
+ * remember to read the API documentation!
+ */
+const mineflayer = require('mineflayer')
+
+if (process.argv.length < 4 || process.argv.length > 6) {
+  console.log('Usage : node inventory.js <host> <port> [<name>] [<password>]')
+  process.exit(1)
+}
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: parseInt(process.argv[3]),
+  username: process.argv[4] ? process.argv[4] : 'inventory',
+  password: process.argv[5]
+})
+
+bot.on('chat', async (username, message) => {
+  if (username === bot.username) return
+  const command = message.split(' ')
+  switch (true) {
+    case message === 'loaded':
+      await bot.waitForChunksToLoad()
+      bot.chat('Ready!')
+      break
+    case /^list$/.test(message):
+      sayItems()
+      break
+    case /^toss \d+ \w+$/.test(message):
+      // toss amount name
+      // ex: toss 64 diamond
+      tossItem(command[2], command[1])
+      break
+    case /^toss \w+$/.test(message):
+      // toss name
+      // ex: toss diamond
+      tossItem(command[1])
+      break
+    case /^equip [\w-]+ \w+$/.test(message):
+      // equip destination name
+      // ex: equip hand diamond
+      equipItem(command[2], command[1])
+      break
+    case /^unequip \w+$/.test(message):
+      // unequip testination
+      // ex: unequip hand
+      unequipItem(command[1])
+      break
+    case /^use$/.test(message):
+      useEquippedItem()
+      break
+    case /^craft \d+ \w+$/.test(message):
+      // craft amount item
+      // ex: craft 64 stick
+      craftItem(command[2], command[1])
+      break
+  }
+})
+
+function sayItems (items = null) {
+  if (!items) {
+    items = bot.inventory.items()
+    if (bot.registry.isNewerOrEqualTo('1.9') && bot.inventory.slots[45]) items.push(bot.inventory.slots[45])
+  }
+  const output = items.map(itemToString).join(', ')
+  if (output) {
+    bot.chat(output)
+  } else {
+    bot.chat('empty')
+  }
+}
+
+async function tossItem (name, amount) {
+  amount = parseInt(amount, 10)
+  const item = itemByName(name)
+  if (!item) {
+    bot.chat(`I have no ${name}`)
+  } else {
+    try {
+      if (amount) {
+        await bot.toss(item.type, null, amount)
+        bot.chat(`tossed ${amount} x ${name}`)
+      } else {
+        await bot.tossStack(item)
+        bot.chat(`tossed ${name}`)
+      }
+    } catch (err) {
+      bot.chat(`unable to toss: ${err.message}`)
+    }
+  }
+}
+
+async function equipItem (name, destination) {
+  const item = itemByName(name)
+  if (item) {
+    try {
+      await bot.equip(item, destination)
+      bot.chat(`equipped ${name}`)
+    } catch (err) {
+      bot.chat(`cannot equip ${name}: ${err.message}`)
+    }
+  } else {
+    bot.chat(`I have no ${name}`)
+  }
+}
+
+async function unequipItem (destination) {
+  try {
+    await bot.unequip(destination)
+    bot.chat('unequipped')
+  } catch (err) {
+    bot.chat(`cannot unequip: ${err.message}`)
+  }
+}
+
+function useEquippedItem () {
+  bot.chat('activating item')
+  bot.activateItem()
+}
+
+async function craftItem (name, amount) {
+  amount = parseInt(amount, 10)
+  const item = bot.registry.itemsByName[name]
+  const craftingTableID = bot.registry.blocksByName.crafting_table.id
+
+  const craftingTable = bot.findBlock({
+    matching: craftingTableID
+  })
+
+  if (item) {
+    const recipe = bot.recipesFor(item.id, null, 1, craftingTable)[0]
+    if (recipe) {
+      bot.chat(`I can make ${name}`)
+      try {
+        await bot.craft(recipe, amount, craftingTable)
+        bot.chat(`did the recipe for ${name} ${amount} times`)
+      } catch (err) {
+        bot.chat(`error making ${name}`)
+      }
+    } else {
+      bot.chat(`I cannot make ${name}`)
+    }
+  } else {
+    bot.chat(`unknown item: ${name}`)
+  }
+}
+
+function itemToString (item) {
+  if (item) {
+    return `${item.name} x ${item.count}`
+  } else {
+    return '(nothing)'
+  }
+}
+
+function itemByName (name) {
+  const items = bot.inventory.items()
+  if (bot.registry.isNewerOrEqualTo('1.9') && bot.inventory.slots[45]) items.push(bot.inventory.slots[45])
+  return items.filter(item => item.name === name)[0]
+}
+
+// This is an example that uses mineflayer-pathfinder to showcase how simple it is to walk to goals
+
+const mineflayer = require('mineflayer')
+const { pathfinder, Movements, goals: { GoalNear } } = require('mineflayer-pathfinder')
+
+if (process.argv.length < 4 || process.argv.length > 6) {
+  console.log('Usage : node gps.js <host> <port> [<name>] [<password>]')
+  process.exit(1)
+}
+
+const bot = mineflayer.createBot({
+  host: process.argv[2],
+  port: parseInt(process.argv[3]),
+  username: process.argv[4] ? process.argv[4] : 'gps',
+  password: process.argv[5]
+})
+
+const RANGE_GOAL = 1 // get within this radius of the player
+
+bot.loadPlugin(pathfinder)
+
+bot.once('spawn', () => {
+  const defaultMove = new Movements(bot)
+
+  bot.on('chat', (username, message) => {
+    if (username === bot.username) return
+    if (message !== 'come') return
+    const target = bot.players[username]?.entity
+    if (!target) {
+      bot.chat("I don't see you !")
+      return
+    }
+    const { x: playerX, y: playerY, z: playerZ } = target.position
+
+    bot.pathfinder.setMovements(defaultMove)
+    bot.pathfinder.setGoal(new GoalNear(playerX, playerY, playerZ, RANGE_GOAL))
+  })
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
